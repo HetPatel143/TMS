@@ -1,0 +1,534 @@
+@import "tailwindcss";
+@import "tailwindcss/utilities";
+@import "./components.css";
+
+@theme {
+  --color-background: #f8fafc;
+  --color-background-alt: #f1f5f9;
+  --color-foreground: #0f172a;
+  --color-foreground-secondary: #64748b;
+  --color-border: #cbd5e1;
+  --color-border-muted: #e2e8f0;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-destructive: #ef4444;
+  --color-destructive-light: #fee2e2;
+  --color-primary-50: #eef2ff;
+  --color-primary-100: #e0e7ff;
+  --color-primary-200: #c7d2fe;
+  --color-primary-300: #a5b4fc;
+  --color-primary-400: #818cf8;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+  --color-primary-800: #3730a3;
+  --color-primary-900: #312e81;
+}
+
+/* ── Global Reset & Typography ──────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+body {
+  margin: 0; font-family: Inter, system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background-color: hsl(0 0% 100%); color: hsl(222 47% 11%);
+}
+
+/* ── Scrollbar Styling ──────────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: hsl(214 32% 95%);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: hsl(214 32% 91%); border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(215 14% 50%);
+}
+
+/* ── Headings ──────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600; color: hsl(222 47% 11%);
+}
+
+h1 { font-size: 1.875rem; line-height: 2.25rem; }
+h2 { font-size: 1.5rem; line-height: 2rem; }
+h3 { font-size: 1.25rem; line-height: 1.75rem; }
+h4 { font-size: 1.125rem; line-height: 1.75rem; }
+h5 { font-size: 1rem; line-height: 1.5rem; }
+h6 { font-size: 0.875rem; line-height: 1.25rem; }
+
+/* ── Links ──────────────────────────────────────────── */
+a {
+  color: hsl(217 91% 45%); transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-duration: 200ms; font-weight: 500;
+}
+/* 
+a:hover {
+  color: hsl(217 91% 40%);
+} */
+
+/* ── Material Design Overrides ─────────────────────── */
+.mat-mdc-card {
+  border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); border-width: 1px; border-color: hsl(214 32% 91%);
+}
+
+.mat-mdc-raised-button.mat-primary {
+  background-color: hsl(217 91% 45%); color: #ffffff;
+}
+
+.mat-mdc-stroked-button {
+  border-width: 1px; border-color: hsl(214 32% 91%);
+}
+
+.mat-mdc-button {
+  color: hsl(222 47% 11%);
+}
+
+.mat-mdc-form-field-label {
+  color: hsl(215 14% 50%);
+}
+
+.mat-mdc-text-field-wrapper {
+  background-color: hsl(210 20% 95%);
+}
+
+.mat-mdc-option {
+  color: hsl(222 47% 11%);
+}
+
+.mat-mdc-option:hover {
+  background-color: hsl(217 91% 90%);
+}
+
+.mat-mdc-option.mat-selected {
+  background-color: hsl(217 91% 90%); color: hsl(217 91% 45%);
+}
+
+.mat-mdc-table {
+  background-color: #ffffff;
+}
+
+.mat-mdc-header-cell {
+  font-weight: 600; color: hsl(215 14% 50%); background-color: hsl(210 20% 95%);
+  border-bottom: 1px solid hsl(214 32% 91%);
+}
+
+.mat-mdc-cell {
+  color: hsl(222 47% 11%);
+  border-bottom: 1px solid hsl(214 32% 95%);
+}
+
+.mat-mdc-row:hover {
+  background-color: hsl(217 91% 95%);
+}
+
+.mat-mdc-paginator {
+  background-color: hsl(210 20% 95%);
+}
+
+/* ── Status Badge Colors ────────────────────────────── */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem; padding-left: 0.75rem; padding-right: 0.75rem; padding-top: 0.25rem; padding-bottom: 0.25rem; border-radius: 9999px; font-size: 0.875rem; line-height: 1.25rem; font-weight: 500;
+}
+
+.status-badge.draft {
+  background-color: #f1f5f9; color: hsl(214 32% 70%);
+}
+
+.status-badge.submitted {
+  background-color: hsl(217 91% 90%); color: hsl(217 91% 50%);
+}
+
+.status-badge.approval {
+  background-color: hsl(38 92% 90%); color: hsl(38 92% 50%);
+}
+
+.status-badge.approved {
+  background-color: hsl(142 76% 90%); color: hsl(142 76% 36%);
+}
+
+.status-badge.rejected {
+  background-color: hsl(0 84% 90%); color: hsl(0 84% 60%);
+}
+
+.status-badge.closed {
+  background-color: #f1f5f9; color: hsl(222 47% 40%);
+}
+
+/* ── Loading Skeleton ──────────────────────────────── */
+.skeleton {
+  background-color: hsl(214 32% 95%); animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; border-radius: 0.375rem;
+}
+
+.pulse-badge {
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+/* ── Skeleton Loading ───────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* ── Sidebar Active Item ────────────────────────────── */
+.nav-active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(79, 70, 229, 0.3)) !important;
+  border-left: 3px solid #818cf8;
+  color: #818cf8 !important;
+}
+
+/* ── Table Styling ──────────────────────────────────── */
+.mat-mdc-table {
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.mat-mdc-header-row {
+  background-color: #f8fafc !important;
+}
+
+.mat-mdc-row:hover {
+  background-color: #f1f5f9 !important;
+  cursor: pointer;
+}
+
+/* ── Form Field Focus ───────────────────────────────── */
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: #4f46e5 !important;
+}
+
+/* ── Stepper Styling ────────────────────────────────── */
+.mat-step-header .mat-step-icon-selected {
+  background-color: #4f46e5 !important;
+}
+
+.mat-step-header .mat-step-icon-state-done {
+  background-color: #10b981 !important;
+}
+
+/* ── Chip Colors ────────────────────────────────────── */
+.chip-draft {
+  background-color: #e2e8f0 !important;
+  color: #475569 !important;
+}
+.chip-submitted {
+  background-color: #dbeafe !important;
+  color: #1d4ed8 !important;
+}
+.chip-inapproval {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+}
+.chip-approved {
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+}
+.chip-rejected {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+}
+.chip-cancelled {
+  background-color: #f1f5f9 !important;
+  color: #64748b !important;
+}
+.chip-closed {
+  background-color: #e0e7ff !important;
+  color: #3730a3 !important;
+}
+.chip-pending {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+/* ── Snackbar Colors ────────────────────────────────── */
+.snackbar-success .mdc-snackbar__surface {
+  background-color: #065f46 !important;
+}
+
+.snackbar-error .mdc-snackbar__surface {
+  background-color: #991b1b !important;
+}
+
+.snackbar-info .mdc-snackbar__surface {
+  background-color: #1e3a5f !important;
+}
+
+/* Dark theme */
+.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+.dark .app-shell,
+.dark header,
+.dark main,
+.dark .bg-white {
+  background-color: #0f172a !important;
+  color: #e2e8f0 !important;
+}
+
+.dark main,
+.dark .bg-slate-50,
+.dark .bg-slate-100 {
+  background-color: #111827 !important;
+}
+
+.dark .border-slate-50,
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-300 {
+  border-color: #334155 !important;
+}
+
+.dark .bg-slate-200,
+.dark .bg-slate-300 {
+  background-color: #334155 !important;
+}
+
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+  color: #f8fafc !important;
+}
+
+.dark .text-slate-700,
+.dark .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-slate-500,
+.dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+.dark input,
+.dark select,
+.dark textarea,
+.dark .card-ui,
+.dark .card-elevated,
+.dark mat-card,
+.dark .mat-mdc-text-field-wrapper,
+.dark .mat-mdc-select-panel,
+.dark .mat-mdc-menu-panel,
+.dark .mat-mdc-dialog-container .mdc-dialog__surface,
+.dark .mat-mdc-card,
+.dark .mat-mdc-table,
+.dark .mat-mdc-paginator {
+  background-color: #1e293b !important;
+  color: #e2e8f0 !important;
+  border-color: #334155 !important;
+}
+
+.dark .card-ui,
+.dark .card-elevated {
+  box-shadow: none !important;
+}
+
+.dark .card-ui:hover,
+.dark .card-elevated:hover {
+  box-shadow: none !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.dark .mat-mdc-header-row,
+.dark .mat-mdc-header-cell,
+.dark .mat-mdc-option,
+.dark .mat-mdc-menu-content {
+  background-color: #162033 !important;
+  color: #e2e8f0 !important;
+}
+
+.dark .mat-mdc-row {
+  background-color: #1e293b !important;
+}
+
+.dark .mat-mdc-table {
+  background-color: #1e293b !important;
+}
+
+.dark .mat-mdc-menu-item {
+  color: #e2e8f0 !important;
+}
+
+.dark .mat-mdc-menu-item .mat-icon,
+.dark .mat-mdc-menu-item .mat-mdc-menu-item-text,
+.dark .mat-mdc-menu-item span {
+  color: #e2e8f0 !important;
+}
+
+.dark .mat-mdc-menu-item:hover,
+.dark .mat-mdc-menu-item.cdk-program-focused,
+.dark .mat-mdc-menu-item.cdk-keyboard-focused {
+  background-color: #273449 !important;
+}
+
+.dark .account-menu-summary {
+  background-color: #162033;
+}
+
+.dark .mat-mdc-menu-panel {
+  border: 1px solid #475569 !important;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35) !important;
+}
+
+.dark .mat-divider {
+  border-top-color: #475569 !important;
+}
+
+.dark .mat-mdc-row:hover,
+.dark tr:hover,
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-100:hover {
+  background-color: #273449 !important;
+}
+
+.dark .bg-green-50 {
+  background-color: #052e16 !important;
+}
+
+.dark .text-green-600,
+.dark .text-green-700 {
+  color: #86efac !important;
+}
+
+.dark .border-green-300 {
+  border-color: #059669 !important;
+}
+
+.dark .mat-mdc-cell,
+.dark .mat-mdc-header-cell {
+  border-bottom-color: #334155 !important;
+}
+
+.dark .chip-draft,
+.dark .chip-cancelled {
+  background-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+.dark .chip-submitted,
+.dark .chip-closed {
+  background-color: #1e3a8a !important;
+  color: #bfdbfe !important;
+}
+
+.dark .chip-inapproval,
+.dark .chip-pending {
+  background-color: #713f12 !important;
+  color: #fde68a !important;
+}
+
+.dark .chip-approved {
+  background-color: #064e3b !important;
+  color: #a7f3d0 !important;
+}
+
+.dark .chip-rejected {
+  background-color: #7f1d1d !important;
+  color: #fecaca !important;
+}
+
+.dark .bg-blue-50 {
+  background-color: #172554 !important;
+}
+
+.dark .text-blue-500,
+.dark .text-blue-700 {
+  color: #93c5fd !important;
+}
+
+.dark .border-blue-200 {
+  border-color: #1d4ed8 !important;
+}
+
+.dark .bg-amber-50 {
+  background-color: #451a03 !important;
+}
+
+.dark .text-amber-500,
+.dark .text-amber-700 {
+  color: #fcd34d !important;
+}
+
+.dark .border-amber-100,
+.dark .border-amber-200 {
+  border-color: #92400e !important;
+}
+
+.dark .bg-emerald-50 {
+  background-color: #052e16 !important;
+}
+
+.dark .text-emerald-500,
+.dark .text-emerald-700 {
+  color: #86efac !important;
+}
+
+.dark .border-emerald-200 {
+  border-color: #047857 !important;
+}
+
+.dark .bg-red-50 {
+  background-color: #450a0a !important;
+}
+
+.dark .text-red-500,
+.dark .text-red-700 {
+  color: #fca5a5 !important;
+}
+
+.dark .border-red-200 {
+  border-color: #b91c1c !important;
+}
+
+.dark .bg-indigo-50 {
+  background-color: #1e1b4b !important;
+}
+
+.dark .text-indigo-500,
+.dark .text-indigo-700 {
+  color: #a5b4fc !important;
+}
+
+.dark .border-indigo-200 {
+  border-color: #4f46e5 !important;
+}
+
+.dark a {
+  color: inherit;
+}

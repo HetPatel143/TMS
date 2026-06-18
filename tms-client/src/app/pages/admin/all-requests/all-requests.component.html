@@ -1,0 +1,147 @@
+<app-dashboard-layout>
+  <div @pageAnimation class="space-y-6">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-900 mb-1">All Requests</h1>
+        <p class="text-slate-500">View and manage all requests across the system</p>
+      </div>
+      <button (click)="exportCsv()"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 shadow-sm transition">
+        <mat-icon style="font-size:18px;width:18px;height:18px;">download</mat-icon>
+        Export CSV
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm px-5 py-4">
+      <form [formGroup]="filterForm" class="flex gap-3 flex-wrap items-center">
+        <!-- Search -->
+        <div class="flex-1 min-w-60 relative">
+          <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            style="font-size:18px;width:18px;height:18px;">search</mat-icon>
+          <input formControlName="search" placeholder="Search by request type, creator, or ID..."
+            class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+        <!-- Status -->
+        <select formControlName="status"
+          class="px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition min-w-40">
+          <option value="">All Statuses</option>
+          @for (status of statuses; track status) {
+            <option [value]="status">{{ status }}</option>
+          }
+        </select>
+        <!-- Type -->
+        <select formControlName="requestTypeId"
+          class="px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition min-w-36">
+          <option value="">All Types</option>
+          @for (type of requestTypes; track type.requestTypeId) {
+            <option [value]="type.requestTypeId">{{ type.name }}</option>
+          }
+        </select>
+      </form>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-slate-100 rounded-2xl px-5 py-4">
+        <p class="text-3xl font-bold text-slate-900">{{ totalCount }}</p>
+        <p class="text-sm text-slate-500 mt-1">Total Requests</p>
+      </div>
+      <div class="bg-orange-50 rounded-2xl px-5 py-4">
+        <p class="text-3xl font-bold text-orange-500">{{ pendingCount }}</p>
+        <p class="text-sm text-slate-500 mt-1">Pending</p>
+      </div>
+      <div class="bg-green-50 rounded-2xl px-5 py-4">
+        <p class="text-3xl font-bold text-green-600">{{ approvedCount }}</p>
+        <p class="text-sm text-slate-500 mt-1">Approved</p>
+      </div>
+      <div class="bg-red-50 rounded-2xl px-5 py-4">
+        <p class="text-3xl font-bold text-red-500">{{ rejectedCount }}</p>
+        <p class="text-sm text-slate-500 mt-1">Rejected</p>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+      @if (isLoading) {
+        <div class="space-y-3 p-6">
+          @for (item of [1,2,3]; track $index) {
+            <div class="skeleton h-14 rounded-xl"></div>
+          }
+        </div>
+      }
+
+      @if (!isLoading && filteredRequests.length > 0) {
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-100">
+              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Request No.</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Request Type</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Submitted By</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Created</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Updated</th>
+              <th class="text-right px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of filteredRequests; track row.requestId) {
+              <tr class="border-b border-slate-50 last:border-0 hover:bg-slate-50 transition">
+                <td class="px-6 py-4">
+                  <div class="font-mono font-semibold text-slate-900">{{ row.requestNumber }}</div>
+                  <div class="text-xs text-slate-400">ID #{{ row.requestId }}</div>
+                </td>
+                <td class="px-6 py-4 text-slate-700">{{ row.requestTypeName }}</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                      [ngClass]="getAvatarColor(row.createdByName)">
+                      {{ getInitials(row.createdByName) }}
+                    </div>
+                    <span class="text-slate-700">{{ row.createdByName }}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <app-status-badge [status]="row.currentStatus"></app-status-badge>
+                </td>
+                <td class="px-6 py-4 text-slate-500">{{ formatDate(row.createdAt) }}</td>
+                <td class="px-6 py-4 text-slate-500">{{ formatDate(row.updatedAt) }}</td>
+                <td class="px-6 py-4 text-right">
+                  <a [routerLink]="['/requests', row.requestId]"
+                    class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition inline-flex">
+                    <mat-icon style="font-size:20px;width:20px;height:20px;">visibility</mat-icon>
+                  </a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+       @if (!isLoading && filteredRequests.length > 0) {
+        <div class="px-6 py-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500">
+          <span>Showing {{ filteredRequests.length }} of {{ totalCount }} requests</span>
+          <mat-paginator
+            [length]="totalCount"
+            [pageSize]="10"
+            [pageSizeOptions]="[10, 25, 50]"
+            (page)="onPageChange($event)"
+            class="bg-transparent">
+          </mat-paginator>
+        </div>
+      }
+
+      @if (!isLoading && filteredRequests.length === 0) {
+        <div class="text-center py-16">
+          <mat-icon class="text-slate-300 mb-3" style="font-size:48px;width:48px;height:48px;">inbox</mat-icon>
+          <h3 class="text-lg font-semibold text-slate-900 mb-1">No requests found</h3>
+          <p class="text-slate-500 text-sm">There are no requests matching your filters</p>
+        </div>
+      }
+
+    </div>
+  </div>
+</app-dashboard-layout>

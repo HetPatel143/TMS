@@ -1,0 +1,116 @@
+<div class="app-shell flex h-screen overflow-hidden bg-white">
+  @if (sidenavOpened) {
+    <aside
+      @sidebarAnimation
+      class="fixed md:static inset-y-0 left-0 z-40 flex w-64 flex-col bg-slate-900 border-r border-slate-800 transition-all duration-300 overflow-hidden"
+    >
+      <div class="flex items-center justify-between px-4 py-4 border-b border-slate-800">
+        <a class="flex items-center gap-3" routerLink="/dashboard">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600 text-white flex-shrink-0">
+            <mat-icon>receipt_long</mat-icon>
+          </div>
+          <div class="min-w-0">
+            <p class="text-base font-bold text-white truncate">TMS</p>
+            <p class="text-xs text-slate-400 truncate">Ticket Manager</p>
+          </div>
+        </a>
+      </div>
+
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+        @for (item of filteredNavItems; track item.route) {
+          <a
+            [routerLink]="item.route"
+            (click)="onNavClick()"
+            routerLinkActive="sidebar-active"
+            [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+            class="sidebar-nav-link group flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200"
+          >
+            <mat-icon class="text-lg">{{ item.icon }}</mat-icon>
+            <span class="text-sm font-medium truncate">{{ item.label }}</span>
+            @if (item.route === '/approvals' && pendingCount > 0) {
+              <span class="ml-auto inline-flex min-w-5 h-5 items-center justify-center rounded-full bg-red-600 px-1 text-xs font-semibold text-white flex-shrink-0">
+                {{ pendingCount }}
+              </span>
+            }
+          </a>
+        }
+      </nav>
+
+      <div class="border-t border-slate-800 p-3">
+        <div class="flex items-center gap-3 rounded-lg bg-slate-800 p-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white text-sm font-bold flex-shrink-0">
+            {{ userInitials }}
+          </div>
+          <div class="min-w-0">
+            <p class="truncate text-sm font-semibold text-white">{{ authService.currentUser?.fullName }}</p>
+            <p class="text-xs text-primary-300 truncate">{{ authService.currentUser?.roleName }}</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+  }
+
+  @if (isMobile && sidenavOpened) {
+    <div class="fixed inset-0 z-30 bg-black/50 md:hidden" (click)="toggleSidenav()"></div>
+  }
+
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header class="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-4 md:px-6 sticky top-0 z-20">
+      <div class="flex items-center gap-4">
+        <button mat-icon-button (click)="toggleSidenav()" class="text-slate-600 hover:text-slate-900" [attr.aria-label]="sidenavOpened ? 'Close navigation' : 'Open navigation'" matTooltip="Navigation">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <h1 class="text-lg font-semibold text-slate-900 hidden sm:block">Ticket Management System</h1>
+      </div>
+      <div class="flex items-center gap-1">
+        <button mat-icon-button (click)="toggleDarkMode()" class="theme-toggle text-slate-600 hover:text-slate-900" [attr.aria-label]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'" [matTooltip]="isDarkMode ? 'Light mode' : 'Dark mode'">
+          <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+          <span class="hidden md:inline text-sm font-medium">{{ isDarkMode ? 'Light' : 'Dark' }}</span>
+        </button>
+        <button mat-icon-button [matMenuTriggerFor]="notificationMenu" class="text-slate-600 hover:text-slate-900 relative" aria-label="Notifications" matTooltip="Notifications">
+          @if (pendingCount > 0) {
+            <span class="absolute top-1 right-1 w-2 h-2 bg-red-600 rounded-full"></span>
+          }
+          <mat-icon>notifications_none</mat-icon>
+        </button>
+        <mat-menu #notificationMenu="matMenu" panelClass="app-menu-panel">
+          <div class="px-4 py-2 text-sm text-slate-600">
+            Pending approvals: <span class="font-semibold text-slate-900">{{ pendingCount }}</span>
+          </div>
+          <mat-divider></mat-divider>
+          <button mat-menu-item routerLink="/approvals">
+            <mat-icon>inbox</mat-icon>
+            <span>View All</span>
+          </button>
+        </mat-menu>
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="text-slate-600 hover:text-slate-900" aria-label="User menu" matTooltip="Account">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu" panelClass="app-menu-panel account-menu-panel">
+          <div class="account-menu-summary px-4 py-3">
+            <p class="text-sm font-semibold text-slate-900">{{ authService.currentUser?.fullName }}</p>
+            <p class="text-xs text-slate-500">{{ authService.currentUser?.email }}</p>
+          </div>
+          <mat-divider></mat-divider>
+          <button mat-menu-item routerLink="/profile">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+          </button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Sign Out</span>
+          </button>
+        </mat-menu>
+      </div>
+    </header>
+
+    @if (loading) {
+      <mat-progress-bar mode="indeterminate" class="!h-1"></mat-progress-bar>
+    }
+
+    <main class="flex-1 overflow-y-auto bg-slate-50 p-4 md:p-6">
+      <ng-content></ng-content>
+    </main>
+  </div>
+</div>

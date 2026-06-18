@@ -1,0 +1,301 @@
+/* ── Navigation Active State ─────────────────────────── */
+a.nav-active {
+  @apply bg-primary-600 text-white rounded-lg shadow-md;
+}
+
+a.nav-active mat-icon {
+  @apply text-white;
+}
+
+/* ── Card Styling ────────────────────────────────────── */
+.card-ui {
+  @apply bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 p-4;
+}
+
+.card-elevated {
+  @apply bg-white rounded-lg border border-slate-100 shadow-md hover:shadow-lg transition-all duration-200 p-6;
+}
+
+mat-card {
+  @apply rounded-lg shadow-sm border border-slate-200 bg-white;
+}
+
+mat-card:hover {
+  @apply shadow-md transition-shadow duration-200;
+}
+
+/* ── Stat Card Styling ──────────────────────────────── */
+.stat-card {
+  @apply bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200 p-5;
+}
+
+.stat-card .stat-icon {
+  @apply flex items-center justify-center w-12 h-12 rounded-lg font-bold text-lg;
+}
+
+.stat-card .stat-label {
+  @apply text-sm text-slate-600 font-medium;
+}
+
+.stat-card .stat-value {
+  @apply text-2xl font-bold text-slate-900 mt-2;
+}
+
+/* ── Form Controls ──────────────────────────────────── */
+.input-ui {
+  @apply w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder-slate-500 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 transition-colors;
+}
+
+.input-ui:disabled {
+  @apply bg-slate-50 text-slate-500 cursor-not-allowed;
+}
+
+.mat-mdc-form-field {
+  @apply w-full;
+}
+
+.mat-mdc-text-field-wrapper {
+  @apply bg-white rounded-lg;
+}
+
+.mat-mdc-form-field-focus-overlay {
+  @apply bg-primary-600/5;
+}
+
+/* ── Buttons ────────────────────────────────────────── */
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-lg font-medium shadow-sm hover:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 text-slate-900 rounded-lg font-medium hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-outline {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 px-3 py-2 text-slate-700 rounded-lg font-medium hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-danger {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium shadow-sm hover:bg-red-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-success {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg font-medium shadow-sm hover:bg-green-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.mat-mdc-raised-button {
+  @apply rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-200;
+}
+
+.mat-mdc-stroked-button {
+  @apply rounded-lg font-medium border border-slate-200 hover:border-primary-600 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200;
+}
+
+.mat-mdc-button {
+  @apply rounded-lg font-medium transition-all duration-200;
+}
+
+/* ── Badge Styles ──────────────────────────────────── */
+.badge-primary {
+  @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-100 text-primary-700 text-xs font-medium;
+}
+
+.badge-success {
+  @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium;
+}
+
+.badge-warning {
+  @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-medium;
+}
+
+.badge-danger {
+  @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium;
+}
+
+.badge-gray {
+  @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium;
+}
+
+/* ── Table Styling ──────────────────────────────────── */
+.table-header-ui {
+  @apply font-semibold text-slate-700 bg-slate-50 border-b border-slate-200 py-3 px-4 text-xs uppercase tracking-wide;
+}
+
+.table-cell-ui {
+  @apply text-slate-900 py-3 px-4 border-b border-slate-200;
+}
+
+.table-row-ui {
+  @apply border-b border-slate-200 hover:bg-slate-50 transition-colors duration-200;
+}
+.mat-mdc-table {
+  @apply w-full bg-white rounded-lg overflow-hidden;
+}
+
+.mat-mdc-header-cell {
+  @apply font-semibold text-slate-700 bg-slate-50 border-b border-slate-200 py-3 px-4;
+}
+
+.mat-mdc-cell {
+  @apply text-slate-900 py-3 px-4 border-b border-slate-200;
+}
+
+.mat-mdc-row:hover {
+  @apply bg-slate-50 transition-colors duration-200;
+}
+
+.mat-mdc-paginator {
+  @apply bg-white border-t border-slate-200;
+}
+
+/* ── Dialog Styling ────────────────────────────────── */
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  @apply rounded-xl shadow-lg;
+}
+
+.mat-mdc-dialog-title {
+  @apply text-xl font-semibold text-slate-900;
+}
+
+/* ── Menu Styling ────────────────────────────────────── */
+.mat-mdc-menu-content {
+  @apply bg-white rounded-lg shadow-lg border border-slate-200;
+}
+
+.mat-mdc-menu-item {
+  @apply text-slate-900 hover:bg-slate-50 transition-colors duration-200;
+}
+
+/* ── Chip Styling ────────────────────────────────────── */
+.mat-mdc-chip {
+  @apply rounded-full bg-primary-100 text-primary-700 border border-primary-300;
+}
+
+.mat-mdc-chip.selected {
+  @apply bg-primary-600 text-white border-primary-600;
+}
+
+/* ── Progress Bar ────────────────────────────────────── */
+.mat-mdc-progress-bar {
+  height: 3px;
+}
+
+.mat-mdc-progress-bar .mdc-linear-progress__bar-inner {
+  @apply bg-primary-600;
+}
+
+/* ── Expansion Panel Styling ────────────────────────── */
+.mat-expansion-panel {
+  @apply border border-slate-200 rounded-lg shadow-sm;
+}
+
+.mat-expansion-panel-header {
+  @apply bg-white hover:bg-slate-50 transition-colors duration-200;
+}
+
+.mat-expansion-panel-header-title {
+  @apply font-semibold text-slate-900;
+}
+
+/* ── Tooltip Styling ────────────────────────────────── */
+.mat-tooltip {
+  @apply bg-slate-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg;
+}
+
+/* ── Empty State ────────────────────────────────────– */
+.empty-state {
+  @apply flex flex-col items-center justify-center py-12 text-center;
+}
+
+.empty-state-icon {
+  @apply text-6xl text-slate-300 mb-4;
+}
+
+.empty-state-title {
+  @apply text-lg font-semibold text-slate-900 mb-2;
+}
+
+.empty-state-description {
+  @apply text-slate-600 text-sm;
+}
+
+/* ── Timeline Styling ────────────────────────────────– */
+.timeline {
+  @apply space-y-4;
+}
+
+.timeline-item {
+  @apply relative pl-8 flex gap-4;
+}
+
+.timeline-dot {
+  @apply absolute left-0 top-1 w-6 h-6 rounded-full border-2 border-slate-200 flex items-center justify-center bg-white;
+}
+
+.timeline-dot.completed {
+  @apply bg-green-600 border-green-600;
+}
+
+.timeline-dot.pending {
+  @apply bg-white border-amber-500;
+}
+
+.timeline-dot.rejected {
+  @apply bg-red-600 border-red-600;
+}
+
+.timeline-line {
+  @apply absolute left-3 top-6 w-0.5 h-full bg-slate-200;
+}
+
+/* ── Loading Animation ──────────────────────────────── */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  @apply bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 bg-[length:1000px_100%] animate-pulse rounded-lg;
+  animation: shimmer 2s infinite;
+}
+
+/* ── Print Styles ───────────────────────────────────── */
+@media print {
+  .no-print {
+    @apply hidden;
+  }
+
+  mat-card {
+    @apply shadow-none border border-black/10;
+  }
+}
+
+/* ── Focus Visible Ring ────────────────────────────── */
+*:focus-visible {
+  @apply outline-none ring-2 ring-primary-600 ring-offset-2;
+}
+
+button:focus-visible {
+  @apply ring-2 ring-primary-600 ring-offset-1;
+}
+
+/* ── Link States ────────────────────────────────────── */
+a {
+  @apply transition-colors duration-200;
+}
+
+a:visited {
+  color: inherit;
+}
+
+a:active {
+  color: inherit;
+}

@@ -1,0 +1,496 @@
+<app-dashboard-layout>
+  <div @pageAnimation class="dashboard-page space-y-6">
+
+    @if (isLoading) {
+      <div class="space-y-4">
+        <div class="skeleton h-10 w-64 rounded-xl"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div class="skeleton h-28 rounded-2xl"></div>
+          <div class="skeleton h-28 rounded-2xl"></div>
+          <div class="skeleton h-28 rounded-2xl"></div>
+          <div class="skeleton h-28 rounded-2xl"></div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+          <div class="skeleton h-72 rounded-2xl lg:col-span-3"></div>
+          <div class="skeleton h-72 rounded-2xl lg:col-span-2"></div>
+        </div>
+      </div>
+    }
+
+    <!-- ═══════════════════════════════════════════
+         EMPLOYEE DASHBOARD
+    ════════════════════════════════════════════ -->
+    @if (!isLoading && role === 'Employee' && employeeData) {
+
+      <!-- Header -->
+      <div class="flex items-start justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-slate-900 mb-1">
+            Welcome back, {{ authService.currentUser?.fullName }}!
+          </h1>
+          <p class="text-slate-500">Here's what's happening with your requests today.</p>
+        </div>
+        <a routerLink="/requests/new"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold shadow-sm transition">
+          <mat-icon class="text-base">add_circle_outline</mat-icon>
+          New Request
+        </a>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="dashboard-stat-card dashboard-stat-blue bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500 mb-1">My Requests</p>
+              <p class="text-4xl font-bold text-slate-900">{{ employeeData.totalRequests }}</p>
+              <p class="text-xs text-slate-400 mt-1">All time</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+              <mat-icon class="text-blue-500" style="font-size:24px;width:24px;height:24px">description</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-stat-card dashboard-stat-amber bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500 mb-1">Pending</p>
+              <p class="text-4xl font-bold text-slate-900">{{ employeeData.inApprovalCount }}</p>
+              <p class="text-xs text-slate-400 mt-1">Awaiting approval</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
+              <mat-icon class="text-amber-500" style="font-size:24px;width:24px;height:24px">schedule</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-stat-card dashboard-stat-emerald bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500 mb-1">Approved</p>
+              <p class="text-4xl font-bold text-slate-900">{{ employeeData.approvedCount }}</p>
+              <p class="text-xs text-slate-400 mt-1">Successfully approved</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+              <mat-icon class="text-emerald-500" style="font-size:24px;width:24px;height:24px">check_circle</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-stat-card dashboard-stat-red bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500 mb-1">Rejected</p>
+              <p class="text-4xl font-bold text-slate-900">{{ employeeData.rejectedCount }}</p>
+              <p class="text-xs text-slate-400 mt-1">Needs revision</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+              <mat-icon class="text-red-500" style="font-size:24px;width:24px;height:24px">cancel</mat-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row: Recent Requests + Drafts -->
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+
+        <div class="dashboard-panel dashboard-panel-primary lg:col-span-3 bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+          <div class="flex items-start justify-between mb-1">
+            <div>
+              <h3 class="text-xl font-bold text-slate-900">Recent Requests</h3>
+              <p class="text-sm text-slate-400 mt-0.5">Your latest request activity</p>
+            </div>
+            <a routerLink="/requests"
+              class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition">
+              View All
+              <mat-icon class="text-base">arrow_forward</mat-icon>
+            </a>
+          </div>
+
+          <div class="mt-5 space-y-3">
+            @if (employeeData.recentRequests && employeeData.recentRequests.length > 0) {
+              @for (req of employeeData.recentRequests; track req.requestId) {
+                <a [routerLink]="['/requests', req.requestId]"
+                  class="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition group">
+                  <div>
+                    <p class="font-semibold text-slate-900 text-sm group-hover:text-primary-600 transition">
+                      {{ req.requestTypeName }}
+                    </p>
+                    <p class="text-xs text-slate-400 mt-0.5">{{ formatDate(req.createdAt) }}</p>
+                  </div>
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border flex-shrink-0"
+                    [ngClass]="{
+                      'bg-slate-100 border-slate-200 text-slate-600':      req.currentStatus === 'Draft',
+                      'bg-blue-50 border-blue-200 text-blue-700':          req.currentStatus === 'Submitted',
+                      'bg-amber-50 border-amber-200 text-amber-700':       req.currentStatus === 'InApproval',
+                      'bg-emerald-50 border-emerald-200 text-emerald-700': req.currentStatus === 'Approved',
+                      'bg-red-50 border-red-200 text-red-700':             req.currentStatus === 'Rejected',
+                      'bg-slate-100 border-slate-200 text-slate-400':      req.currentStatus === 'Cancelled',
+                      'bg-indigo-50 border-indigo-200 text-indigo-700':    req.currentStatus === 'Closed'
+                    }">
+                    <mat-icon style="font-size:11px;width:11px;height:11px;line-height:11px">
+                      {{ getStatusIcon(req.currentStatus) }}
+                    </mat-icon>
+                    {{ req.currentStatus === 'InApproval' ? 'In Approval' : req.currentStatus }}
+                  </span>
+                </a>
+              }
+            } @else {
+              <div class="text-center py-10">
+                <mat-icon class="text-5xl text-slate-300 mb-3">inbox</mat-icon>
+                <p class="text-slate-500 text-sm mb-4">No requests yet</p>
+                <a routerLink="/requests/new"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition">
+                  <mat-icon class="text-base">add</mat-icon>
+                  Create Request
+                </a>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="dashboard-panel dashboard-panel-indigo lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+          <div class="flex items-center gap-3 mb-1">
+            <mat-icon class="text-slate-700" style="font-size:22px;width:22px;height:22px">description</mat-icon>
+            <h3 class="text-xl font-bold text-slate-900">Drafts</h3>
+          </div>
+          <p class="text-sm text-slate-400 mb-5">Continue working on your saved requests</p>
+
+          <div class="space-y-3">
+            @if (draftRequests && draftRequests.length > 0) {
+              @for (draft of draftRequests; track draft.requestId) {
+                <div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-slate-200 transition">
+                  <div>
+                    <p class="font-semibold text-slate-900 text-sm">{{ draft.requestTypeName }}</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Last updated {{ formatDate(draft.updatedAt) }}</p>
+                  </div>
+                  <a [routerLink]="['/requests', draft.requestId, 'edit']"
+                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition flex-shrink-0 ml-3">
+                    Continue
+                    <mat-icon class="text-base">arrow_forward</mat-icon>
+                  </a>
+                </div>
+              }
+            } @else {
+              <div class="text-center py-10">
+                <mat-icon class="text-5xl text-slate-300 mb-3">edit_note</mat-icon>
+                <p class="text-slate-500 text-sm">No drafts saved yet</p>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- ═══════════════════════════════════════════
+         MANAGER DASHBOARD
+    ════════════════════════════════════════════ -->
+  @else if (!isLoading && (role === 'Manager' || role === 'Finance' || role === 'IT' || role === 'HR')) {
+
+  <!-- Header -->
+  <div class="flex items-start justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900 mb-1">
+        Welcome back, {{ authService.currentUser?.fullName }}!
+      </h1>
+      <p class="text-slate-500">Manage and review requests from your team.</p>
+    </div>
+    <a routerLink="/approvals"
+      class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold shadow-sm transition">
+      <mat-icon class="text-base">pending_actions</mat-icon>
+      View All Approvals
+    </a>
+  </div>
+
+  <!-- Stat Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+
+    <div class="dashboard-stat-card dashboard-stat-blue bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-sm text-slate-500 mb-1">My Requests</p>
+          <p class="text-4xl font-bold text-slate-900">{{ approverData?.totalMyRequests ?? 0 }}</p>
+          <p class="text-xs text-slate-400 mt-1">All time</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+          <mat-icon class="text-blue-500" style="font-size:24px;width:24px;height:24px">description</mat-icon>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-stat-card dashboard-stat-amber bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-sm text-slate-500 mb-1">Pending Approvals</p>
+          <p class="text-4xl font-bold text-slate-900">{{ approverData?.totalPendingApprovals ?? 0 }}</p>
+          <p class="text-xs text-slate-400 mt-1">Awaiting your action</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
+          <mat-icon class="text-amber-500" style="font-size:24px;width:24px;height:24px">schedule</mat-icon>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="dashboard-stat-card dashboard-stat-emerald bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-sm text-slate-500 mb-1">Approved</p>
+<p class="text-4xl font-bold text-slate-900">{{ approverData?.myApprovedCount ?? 0 }}</p>
+<p class="text-xs text-slate-400 mt-1">Approved by me</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+          <mat-icon class="text-emerald-500" style="font-size:24px;width:24px;height:24px">check_circle</mat-icon>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-stat-card dashboard-stat-red bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-sm text-slate-500 mb-1">Rejected</p>
+          <p class="text-4xl font-bold text-slate-900">{{ approverData?.rejectedCount ?? 0 }}</p>
+          <p class="text-xs text-slate-400 mt-1">Returned for revision</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+          <mat-icon class="text-red-500" style="font-size:24px;width:24px;height:24px">cancel</mat-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending Approvals Panel (latest 3) -->
+  <div class="dashboard-panel dashboard-panel-amber bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+    <div class="flex items-start justify-between mb-5">
+      <div class="flex items-center gap-3">
+        <mat-icon class="text-amber-500" style="font-size:22px;width:22px;height:22px">pending_actions</mat-icon>
+        <div>
+          <h3 class="text-xl font-bold text-slate-900">Pending Approvals</h3>
+          <p class="text-sm text-slate-400 mt-0.5">Requests waiting for your approval</p>
+        </div>
+      </div>
+      <a routerLink="/approvals"
+        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition">
+        View All
+        <mat-icon class="text-base">arrow_forward</mat-icon>
+      </a>
+    </div>
+
+    @if (approverData?.pendingApprovals && approverData!.pendingApprovals.length > 0) {
+      <div class="flex items-center gap-2 px-4 py-3 rounded-xl bg-amber-50 border border-amber-100 mb-4">
+        <mat-icon class="text-amber-500 flex-shrink-0" style="font-size:18px;width:18px;height:18px">schedule</mat-icon>
+        <p class="text-sm font-medium text-amber-700">
+          {{ approverData!.totalPendingApprovals }} request{{ approverData!.totalPendingApprovals > 1 ? 's' : '' }} pending your approval
+        </p>
+      </div>
+      <div class="space-y-3">
+        @for (req of approverData!.pendingApprovals.slice(0, 3); track req.requestId) {
+          <div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                <mat-icon class="text-amber-500" style="font-size:18px;width:18px;height:18px">hourglass_top</mat-icon>
+              </div>
+              <div class="min-w-0">
+                <p class="font-semibold text-slate-900 text-sm truncate">{{ req.requestTypeName }}</p>
+                <p class="text-xs text-slate-400 mt-0.5">
+                  by {{ req.requesterName }} &bull; {{ formatDate(req.submittedAt) }}
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0 ml-4">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 border border-amber-200 text-amber-700">
+                <mat-icon style="font-size:11px;width:11px;height:11px;line-height:11px">hourglass_top</mat-icon>
+                In Approval
+              </span>
+              <a [routerLink]="['/requests', req.requestId]"
+                class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition">
+                <mat-icon style="font-size:16px;width:16px;height:16px">visibility</mat-icon>
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="text-center py-10">
+        <mat-icon class="text-5xl text-slate-300 mb-3">inbox</mat-icon>
+        <p class="text-slate-500 text-sm">No pending approvals</p>
+      </div>
+    }
+  </div>
+
+}
+
+    <!-- ═══════════════════════════════════════════
+         ADMIN DASHBOARD
+    ════════════════════════════════════════════ -->
+    @else if (!isLoading && role === 'Admin' && adminData) {
+
+      <!-- Header -->
+      <div class="flex items-start justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-slate-900 mb-1">Admin Dashboard</h1>
+          <p class="text-slate-500">Manage users, request types, and system settings.</p>
+        </div>
+        <a routerLink="/admin/request-types"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold shadow-sm transition">
+          <mat-icon class="text-base">add_circle_outline</mat-icon>
+          New Request Type
+        </a>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+
+        <div class="dashboard-stat-card dashboard-stat-blue bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500 mb-1">Total Requests</p>
+              <p class="text-4xl font-bold text-slate-900">{{ adminData.totalRequests }}</p>
+              <p class="text-xs text-slate-400 mt-1">All time</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+              <mat-icon class="text-blue-500" style="font-size:24px;width:24px;height:24px">description</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-stat-card dashboard-stat-amber bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500 mb-1">Pending Approval</p>
+              <p class="text-4xl font-bold text-slate-900">{{ adminPendingCount }}</p>
+              <p class="text-xs text-slate-400 mt-1">Awaiting action</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
+              <mat-icon class="text-amber-500" style="font-size:24px;width:24px;height:24px">schedule</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-stat-card dashboard-stat-emerald bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500 mb-1">Approved</p>
+              <p class="text-4xl font-bold text-slate-900">{{ adminApprovedCount }}</p>
+              <p class="text-xs text-slate-400 mt-1">Successfully processed</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+              <mat-icon class="text-emerald-500" style="font-size:24px;width:24px;height:24px">check_circle</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-stat-card dashboard-stat-indigo bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500 mb-1">Total Users</p>
+              <p class="text-4xl font-bold text-slate-900">{{ adminData.totalUsers }}</p>
+              <p class="text-xs text-slate-400 mt-1">In the system</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
+              <mat-icon class="text-indigo-500" style="font-size:24px;width:24px;height:24px">group</mat-icon>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+  <!-- Bottom Row: Request Types + Recent Activity -->
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+
+  <!-- Request Types (left, wider) -->
+  <div class="dashboard-panel dashboard-panel-emerald lg:col-span-3 bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+    <div class="flex items-start justify-between mb-5">
+      <div>
+        <h3 class="text-xl font-bold text-slate-900">Request Types</h3>
+        <p class="text-sm text-slate-400 mt-0.5">Active request categories</p>
+      </div>
+      <a routerLink="/admin/request-types"
+        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition">
+        Manage
+        <mat-icon class="text-base">arrow_forward</mat-icon>
+      </a>
+    </div>
+
+    <div class="space-y-3">
+      @if (adminData.requestTypeStats && adminData.requestTypeStats.length > 0) {
+        @for (rt of adminData.requestTypeStats; track rt.requestTypeName) {
+          <div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition">
+            <div>
+              <p class="font-semibold text-slate-900 text-sm">{{ rt.requestTypeName }}</p>
+              <p class="text-xs text-slate-400 mt-0.5">{{ rt.description }}</p>
+            </div>
+            <div class="text-right flex-shrink-0 ml-4">
+              <p class="font-semibold text-slate-700 text-sm">{{ rt.totalRequests }}</p>
+              <p class="text-xs text-slate-400">requests</p>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="text-center py-10">
+          <mat-icon class="text-5xl text-slate-300 mb-3">category</mat-icon>
+          <p class="text-slate-500 text-sm">No request types found</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Recent Activity (right, narrower) -->
+  <div class="dashboard-panel dashboard-panel-primary lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+    <div class="flex items-start justify-between mb-5">
+      <div>
+        <h3 class="text-xl font-bold text-slate-900">Recent Activity</h3>
+        <p class="text-sm text-slate-400 mt-0.5">Latest system-wide requests</p>
+      </div>
+      <a routerLink="/admin/requests"
+        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition">
+        View All
+        <mat-icon class="text-base">arrow_forward</mat-icon>
+      </a>
+    </div>
+
+    <div class="space-y-3">
+      @if (adminData.recentActivity && adminData.recentActivity.length > 0) {
+        @for (req of adminData.recentActivity; track req.requestId) {
+          <a [routerLink]="['/requests', req.requestId]"
+            class="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition group">
+            <div>
+              <p class="font-semibold text-slate-900 text-sm group-hover:text-primary-600 transition">
+                {{ req.requestTypeName }}
+              </p>
+              <p class="text-xs text-slate-400 mt-0.5">by {{ req.requesterName }}</p>
+            </div>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border flex-shrink-0"
+              [ngClass]="{
+                'bg-slate-100 border-slate-200 text-slate-600':      req.currentStatus === 'Draft',
+                'bg-blue-50 border-blue-200 text-blue-700':          req.currentStatus === 'Submitted',
+                'bg-amber-50 border-amber-200 text-amber-700':       req.currentStatus === 'InApproval',
+                'bg-emerald-50 border-emerald-200 text-emerald-700': req.currentStatus === 'Approved',
+                'bg-red-50 border-red-200 text-red-700':             req.currentStatus === 'Rejected',
+                'bg-slate-100 border-slate-200 text-slate-400':      req.currentStatus === 'Cancelled',
+                'bg-indigo-50 border-indigo-200 text-indigo-700':    req.currentStatus === 'Closed'
+              }">
+              <mat-icon style="font-size:11px;width:11px;height:11px;line-height:11px">
+                {{ getStatusIcon(req.currentStatus) }}
+              </mat-icon>
+              {{ req.currentStatus === 'InApproval' ? 'In Approval' : req.currentStatus }}
+            </span>
+          </a>
+        }
+      } @else {
+        <div class="text-center py-10">
+          <mat-icon class="text-5xl text-slate-300 mb-3">inbox</mat-icon>
+          <p class="text-slate-500 text-sm">No recent activity</p>
+        </div>
+      }
+    </div>
+  </div>
+
+</div>
+    }
+
+  </div>
+</app-dashboard-layout>

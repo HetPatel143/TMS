@@ -1,0 +1,196 @@
+<!-- <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white">
+  <section class="relative hidden lg:flex items-center justify-center bg-gradient-to-br from-primary-600 to-primary-800 p-12 overflow-hidden">
+    <div class="absolute -top-10 -right-10 h-48 w-48 rounded-3xl bg-white/10 rotate-12"></div>
+    <div class="absolute bottom-10 left-8 h-36 w-36 rounded-2xl bg-white/10 -rotate-6"></div>
+    <div class="absolute top-1/2 right-1/3 h-24 w-24 rounded-xl bg-white/10"></div>
+    <div class="relative z-10 max-w-md text-white">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="h-12 w-12 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+        <h1 class="text-4xl font-bold">TMS</h1>
+      </div>
+      <p class="text-2xl font-semibold leading-tight">Streamline your workplace requests</p>
+      <p class="mt-3 text-white/80">One portal for employees, approvers, and admins.</p>
+    </div>
+  </section>
+
+  <section class="flex items-center justify-center bg-slate-50 p-6">
+    <div class="w-full max-w-md space-y-4" @fadeInUp>
+      <div class="rounded-xl bg-white shadow-sm border border-slate-200 p-8">
+        <h2 class="text-2xl font-bold text-slate-900 mb-1">Welcome back</h2>
+        <p class="text-sm text-slate-600 mb-6">Sign in to continue to your workspace.</p>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+          <div>
+            <label class="text-sm font-medium text-slate-700">Email</label>
+            <div class="mt-1.5 relative">
+              <mat-icon class="absolute left-3 top-2.5 text-slate-400 text-xl">email</mat-icon>
+              <input class="input-ui w-full pl-10" formControlName="email" type="email" placeholder="name@company.com">
+            </div>
+            @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+              <p class="mt-1 text-xs text-red-600">Please enter a valid email</p>
+            }
+          </div>
+
+          <div>
+            <label class="text-sm font-medium text-slate-700">Password</label>
+            <div class="mt-1.5 relative">
+              <mat-icon class="absolute left-3 top-2.5 text-slate-400 text-xl">lock</mat-icon>
+              <input class="input-ui w-full pl-10 pr-10" formControlName="password" [type]="hidePassword ? 'password' : 'text'" placeholder="Enter password">
+              <button type="button" class="absolute right-3 top-2 text-slate-500 hover:text-slate-700" (click)="hidePassword = !hidePassword">
+                <mat-icon class="text-lg">{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            [disabled]="isLoading"
+            class="w-full btn-primary justify-center disabled:opacity-50"
+          >
+            @if (!isLoading) { 
+              <mat-icon>login</mat-icon>
+              Sign In 
+            } @else { 
+              <mat-spinner diameter="20" class="!mr-2"></mat-spinner>
+              Signing in... 
+            }
+          </button>
+
+          <div class="relative">
+            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+            <div class="relative flex justify-center text-xs"><span class="px-2 bg-white text-slate-500">or try demo account</span></div>
+          </div>
+        </form>
+      </div>
+
+      <div class="rounded-xl bg-white shadow-sm border border-slate-200 p-4">
+        <div class="flex items-center gap-2 mb-3">
+          <mat-icon class="text-primary-600">account_circle</mat-icon>
+          <h3 class="text-sm font-semibold text-slate-900">Demo Accounts</h3>
+        </div>
+        <div class="max-h-56 overflow-y-auto space-y-2">
+          @for (account of demoAccounts; track account.email) {
+            <button
+              type="button"
+              class="w-full text-left rounded-lg border border-slate-200 p-3 hover:border-primary-400 hover:bg-primary-50 transition-all duration-200"
+              (click)="selectDemoAccount(account)"
+            >
+              <div class="flex items-center justify-between gap-2">
+                <div>
+                  <p class="text-sm font-semibold text-slate-900">{{ account.name }}</p>
+                  <p class="text-xs text-slate-600">{{ account.email }}</p>
+                </div>
+                <span class="text-[11px] px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-medium">{{ account.role }}</span>
+              </div>
+              <p class="mt-1.5 text-xs text-primary-600 font-medium">Pwd: {{ account.password }}</p>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</div> -->
+
+
+<div class="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-6">
+
+  <!-- Logo + Title -->
+  <div class="flex flex-col items-center mb-8">
+    <div class="w-16 h-16 rounded-2xl bg-primary-600 flex items-center justify-center mb-4 shadow-lg">
+      <span class="text-white text-xl font-bold">TMS</span>
+    </div>
+    <h1 class="text-3xl font-bold text-slate-900">Ticket Management System</h1>
+    <p class="text-slate-500 mt-1">Enterprise Request & Approval Platform</p>
+  </div>
+
+  <div class="w-full max-w-lg space-y-4" @fadeInUp>
+
+    <!-- Login Card -->
+    <div class="rounded-2xl bg-white shadow-sm border border-slate-200 p-8">
+      <h2 class="text-xl font-bold text-slate-900 mb-1">Sign in to your account</h2>
+      <p class="text-sm text-slate-500 mb-6">Enter your credentials to access the system</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+
+        <!-- Email -->
+        <div>
+          <label class="text-sm font-medium text-slate-700">Email</label>
+          <div class="mt-1.5 relative">
+            <mat-icon class="absolute left-3 top-2.5 text-slate-400 text-xl">email</mat-icon>
+            <input
+              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+              formControlName="email" type="email" placeholder="name@company.com">
+          </div>
+          @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+            <p class="mt-1 text-xs text-red-600">Please enter a valid email</p>
+          }
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="text-sm font-medium text-slate-700">Password</label>
+          <div class="mt-1.5 relative">
+            <mat-icon class="absolute left-3 top-2.5 text-slate-400 text-xl">lock</mat-icon>
+            <input
+              class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+              formControlName="password"
+              [type]="hidePassword ? 'password' : 'text'"
+              placeholder="Enter password">
+            <button type="button"
+              class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 transition"
+              (click)="hidePassword = !hidePassword">
+              <mat-icon class="text-lg">{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          [disabled]="isLoading"
+          class="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold shadow-sm transition disabled:opacity-50">
+          @if (!isLoading) {
+            Sign In
+            <mat-icon class="text-base">arrow_forward</mat-icon>
+          } @else {
+            <mat-spinner diameter="20" class="!mr-2"></mat-spinner>
+            Signing in...
+          }
+        </button>
+
+      </form>
+    </div>
+
+    <!-- Demo Accounts Card -->
+    <div class="rounded-2xl bg-white shadow-sm border border-slate-200 p-6">
+      <h3 class="text-sm font-semibold text-slate-500 mb-4">Demo Accounts</h3>
+      <div class="grid grid-cols-2 gap-3">
+        @for (account of demoAccounts; track account.email) {
+          <button
+            type="button"
+            class="demo-account-button text-left rounded-xl border border-slate-200 p-3.5 hover:border-primary-400 hover:bg-primary-50 transition-all duration-150"
+            (click)="selectDemoAccount(account)">
+            <div class="flex items-center justify-between mb-1">
+              <p class="text-sm font-semibold text-slate-900">{{ account.name }}</p>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                [ngClass]="{
+                  'bg-blue-100 text-blue-700':    account.role === 'Employee',
+                  'bg-violet-100 text-violet-700': account.role === 'Manager',
+                  'bg-emerald-100 text-emerald-700': account.role === 'Finance',
+                  'bg-orange-100 text-orange-700': account.role === 'IT',
+                  'bg-pink-100 text-pink-700':    account.role === 'HR',
+                  'bg-red-100 text-red-700':      account.role === 'Admin'
+                }">
+                {{ account.role }}
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 truncate">{{ account.email }}</p>
+          </button>
+        }
+      </div>
+    </div>
+
+  </div>
+</div>

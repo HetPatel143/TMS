@@ -1,0 +1,107 @@
+:host {
+  display: block;
+}
+
+.dashboard-stat-card,
+.dashboard-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-stat-card {
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.dashboard-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.09);
+}
+
+.dashboard-stat-card::before,
+.dashboard-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+}
+
+.dashboard-stat-blue {
+  background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%) !important;
+  border-color: #bfdbfe !important;
+}
+
+.dashboard-stat-blue::before,
+.dashboard-panel-primary::before {
+  background-color: #3b82f6;
+}
+
+.dashboard-stat-amber {
+  background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%) !important;
+  border-color: #fde68a !important;
+}
+
+.dashboard-stat-amber::before,
+.dashboard-panel-amber::before {
+  background-color: #f59e0b;
+}
+
+.dashboard-stat-emerald {
+  background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%) !important;
+  border-color: #a7f3d0 !important;
+}
+
+.dashboard-stat-emerald::before,
+.dashboard-panel-emerald::before {
+  background-color: #10b981;
+}
+
+.dashboard-stat-red {
+  background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%) !important;
+  border-color: #fecaca !important;
+}
+
+.dashboard-stat-red::before {
+  background-color: #ef4444;
+}
+
+.dashboard-stat-indigo {
+  background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%) !important;
+  border-color: #c7d2fe !important;
+}
+
+.dashboard-stat-indigo::before,
+.dashboard-panel-indigo::before {
+  background-color: #6366f1;
+}
+
+.dashboard-panel-primary {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%) !important;
+  border-color: #bfdbfe !important;
+}
+
+.dashboard-panel-amber {
+  background: linear-gradient(180deg, #ffffff 0%, #fffaf0 100%) !important;
+  border-color: #fde68a !important;
+}
+
+.dashboard-panel-emerald {
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%) !important;
+  border-color: #bbf7d0 !important;
+}
+
+.dashboard-panel-indigo {
+  background: linear-gradient(180deg, #ffffff 0%, #f5f7ff 100%) !important;
+  border-color: #c7d2fe !important;
+}
+
+:host-context(.dark) .dashboard-stat-card,
+:host-context(.dark) .dashboard-panel {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  box-shadow: none;
+}
+
+:host-context(.dark) .dashboard-stat-card:hover {
+  transform: none;
+  box-shadow: none;
+}

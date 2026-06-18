@@ -1,0 +1,272 @@
+<app-dashboard-layout>
+  <div @pageAnimation>
+
+    <!-- Loading -->
+    @if (isLoading) {
+      <div class="space-y-4">
+        <div class="skeleton h-12 w-72 rounded-xl"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 space-y-4">
+            <div class="skeleton h-48 rounded-2xl"></div>
+            <div class="skeleton h-56 rounded-2xl"></div>
+            <div class="skeleton h-48 rounded-2xl"></div>
+          </div>
+          <div class="space-y-4">
+            <div class="skeleton h-44 rounded-2xl"></div>
+            <div class="skeleton h-32 rounded-2xl"></div>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (!isLoading && request) {
+
+      <!-- ── Page Header ── -->
+      <div class="flex items-start justify-between mb-6 gap-4 flex-wrap">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900">
+            {{ request.requestTypeName }} {{ request.requestNumber }}
+          </h1>
+          <p class="text-sm text-slate-400 mt-0.5">
+            Request ID #{{ request.requestId }} · Created on {{ formatDateLong(request.createdAt) }}
+          </p>
+        </div>
+
+        <!-- Back + Cancel/Submit buttons -->
+       <div class="flex items-center gap-2">
+  <a [routerLink]="authService.userRole === 'Admin' ? '/dashboard' : '/requests'"
+    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition">
+    <mat-icon class="text-base">arrow_back</mat-icon>
+    Back
+  </a>
+
+  @if (canEdit) {
+    <a [routerLink]="['/requests', request!.requestId, 'edit']"
+      class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition">
+      <mat-icon class="text-base">edit_square</mat-icon>
+      Edit
+    </a>
+  }
+
+  @if (canCancel) {
+    <button (click)="cancelRequest()"
+      class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-red-200 text-red-600 text-sm font-medium hover:bg-red-50 transition">
+      <mat-icon class="text-base">close</mat-icon>
+      Cancel
+    </button>
+  }
+
+  @if (canSubmit) {
+    <button (click)="submitRequest()"
+      class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold transition">
+      <mat-icon class="text-base">send</mat-icon>
+      Submit
+    </button>
+  }
+</div>
+      </div>
+
+      <!-- ── Main Grid ── -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- LEFT: Main content (2/3) -->
+        <div class="lg:col-span-2 space-y-5">
+
+          <!-- ① Request Details card -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div class="flex items-center justify-between mb-5">
+              <h2 class="text-xl font-bold text-slate-900">Request Details</h2>
+              <!-- Status pill top-right -->
+              <app-status-badge [status]="request.currentStatus"></app-status-badge>
+            </div>
+
+            <!-- Field rows -->
+            <div class="divide-y divide-slate-100">
+              @for (fv of request.fieldValues; track fv.fieldLabel) {
+                <div class="flex items-center justify-between py-3.5">
+                  <span class="text-sm text-slate-400 w-1/3">{{ fv.fieldLabel }}</span>
+                  <span class="text-sm font-semibold text-slate-900 text-right">
+                    {{ fv.fieldValue || '—' }}
+                  </span>
+                </div>
+              }
+              @if (request.fieldValues.length === 0) {
+                <p class="text-center text-slate-400 text-sm py-8">No field values</p>
+              }
+            </div>
+          </div>
+
+          <!-- ② Approval Progress card -->
+          @if (request.approvals && request.approvals.length > 0) {
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+              <h2 class="text-xl font-bold text-slate-900 mb-1">Approval Progress</h2>
+              <p class="text-sm text-slate-400 mb-6">Track the status of each approval step</p>
+
+              <div class="space-y-0">
+                @for (approval of request.approvals; track approval.approvalId; let last = $last) {
+                  <div class="flex items-start gap-4">
+
+                    <!-- Timeline icon + connector -->
+                    <div class="flex flex-col items-center flex-shrink-0">
+                      <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center"
+                        [ngClass]="{
+                          'bg-emerald-500 border-emerald-500': approval.approvalStatus === 'Approved',
+                          'bg-red-500 border-red-500':         approval.approvalStatus === 'Rejected',
+                          'bg-white border-slate-300':         approval.approvalStatus === 'Pending'
+                        }">
+                        @if (approval.approvalStatus === 'Approved') {
+                          <mat-icon class="text-white text-lg">check</mat-icon>
+                        } @else if (approval.approvalStatus === 'Rejected') {
+                          <mat-icon class="text-white text-lg">close</mat-icon>
+                        } @else {
+                          <mat-icon class="text-slate-400 text-lg">schedule</mat-icon>
+                        }
+                      </div>
+                      @if (!last) {
+                        <div class="w-0.5 h-8 bg-slate-200 my-1"></div>
+                      }
+                    </div>
+
+                    <!-- Step content -->
+                    <div class="flex-1 flex items-center justify-between pb-2" [class.mb-6]="!last">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-sm font-semibold text-slate-800">
+                          Step {{ approval.approvalOrder }}
+                        </span>
+                        <!-- Role pill -->
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                          [ngClass]="{
+                            'bg-violet-50 border-violet-200 text-violet-700': approval.roleName === 'Manager',
+                            'bg-sky-50 border-sky-200 text-sky-700':         approval.roleName === 'IT',
+                            'bg-emerald-50 border-emerald-200 text-emerald-700': approval.roleName === 'Finance',
+                            'bg-rose-50 border-rose-200 text-rose-700':      approval.roleName === 'HR'
+                          }">
+                          <mat-icon style="font-size:11px;width:11px;height:11px;line-height:11px">
+                            {{ getRoleIcon(approval.roleName) }}
+                          </mat-icon>
+                          {{ approval.roleName }}
+                        </span>
+                        @if (approval.approvedByName) {
+                          <span class="text-xs text-slate-400">by {{ approval.approvedByName }}</span>
+                        }
+                        @if (approval.comments) {
+                          <span class="text-xs text-slate-400 italic">"{{ approval.comments }}"</span>
+                        }
+                      </div>
+
+                      <!-- Approval status badge -->
+                      <app-status-badge [status]="approval.approvalStatus"></app-status-badge>
+                    </div>
+
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- ③ Status History card -->
+          @if (request.statusHistory && request.statusHistory.length > 0) {
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+              <h2 class="text-xl font-bold text-slate-900 mb-1">Status History</h2>
+              <p class="text-sm text-slate-400 mb-5">Complete audit trail of status changes</p>
+
+              <div class="divide-y divide-slate-100">
+                @for (h of request.statusHistory; track h.changedAt) {
+                  <div class="flex items-center justify-between py-4">
+
+                    <!-- From → To pills -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-slate-100 border-slate-200 text-slate-600">
+                        {{ h.oldStatus || 'Start' }}
+                      </span>
+                      <mat-icon class="text-slate-400 text-base">arrow_forward</mat-icon>
+                      <app-status-badge [status]="h.newStatus"></app-status-badge>
+                    </div>
+
+                    <!-- Who + when -->
+                    <div class="text-right flex-shrink-0 ml-4">
+                      <p class="text-sm font-medium text-slate-700">{{ h.changedByName }}</p>
+                      <p class="text-xs text-slate-400">{{ formatDate(h.changedAt) }}</p>
+                    </div>
+
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+
+        <!-- RIGHT: Sidebar (1/3) -->
+        <div class="space-y-5">
+
+          <!-- Request Information -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <h3 class="text-base font-bold text-slate-900 mb-5">Request Information</h3>
+
+            <div class="space-y-4">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+                  <mat-icon class="text-slate-500" style="font-size:18px;width:18px;height:18px">tag</mat-icon>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400">Request number</p>
+                  <p class="text-sm font-semibold text-slate-900">{{ request.requestNumber }}</p>
+                  <p class="text-xs text-slate-400">Internal ID #{{ request.requestId }}</p>
+                </div>
+              </div>
+
+              <div class="border-t border-slate-100"></div>
+
+              <!-- Created by -->
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+                  <mat-icon class="text-slate-500" style="font-size:18px;width:18px;height:18px">person</mat-icon>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400">Created by</p>
+                  <p class="text-sm font-semibold text-slate-900">{{ request.createdByName }}</p>
+                </div>
+              </div>
+
+              <div class="border-t border-slate-100"></div>
+
+              <!-- Created on -->
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+                  <mat-icon class="text-slate-500" style="font-size:18px;width:18px;height:18px">calendar_today</mat-icon>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400">Created on</p>
+                  <p class="text-sm font-semibold text-slate-900">{{ formatDateLong(request.createdAt) }}</p>
+                </div>
+              </div>
+
+              <div class="border-t border-slate-100"></div>
+
+              <!-- Last updated -->
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+                  <mat-icon class="text-slate-500" style="font-size:18px;width:18px;height:18px">schedule</mat-icon>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400">Last updated</p>
+                  <p class="text-sm font-semibold text-slate-900">{{ formatDateLong(request.updatedAt) }}</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+     <!-- Request Type -->
+<div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+  <h3 class="text-base font-bold text-slate-900 mb-3">Request Type</h3>
+  <p class="text-sm font-semibold text-slate-900">{{ request.requestTypeName }}</p>
+</div>
+
+        </div>
+      </div>
+    }
+
+  </div>
+</app-dashboard-layout>

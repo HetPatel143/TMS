@@ -1,0 +1,441 @@
+<app-dashboard-layout>
+  <div @pageAnimation class="space-y-4">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-900 mb-1">Request Types</h1>
+        <p class="text-slate-500">Configure request types and their dynamic fields</p>
+      </div>
+      <button (click)="showCreateForm = !showCreateForm"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-sm transition">
+        <mat-icon class="text-base">add_circle_outline</mat-icon>
+        Create Request Type
+      </button>
+    </div>
+
+    <!-- Create Form Modal -->
+    @if (showCreateForm) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center"
+        style="background: rgba(0,0,0,0.55);"
+        (click)="showCreateForm = false">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4"
+          (click)="$event.stopPropagation()">
+          <div class="flex items-start justify-between px-6 pt-6 pb-4 border-b border-slate-100">
+            <div>
+              <h3 class="text-lg font-bold text-slate-900">Create Request Type</h3>
+              <p class="text-sm text-slate-500 mt-0.5">Add a new request type with a name and description</p>
+            </div>
+            <button (click)="showCreateForm = false" class="text-slate-400 hover:text-slate-700 transition ml-4" aria-label="Close create request type form" matTooltip="Close">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+          <form [formGroup]="createTypeForm" (ngSubmit)="createType()" class="px-6 py-5 space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Name *</label>
+              <input formControlName="name" placeholder="E.g., Laptop Request"
+                class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+              @if (createTypeForm.get('name')?.touched && createTypeForm.get('name')?.hasError('required')) {
+                <p class="text-red-500 text-xs mt-1">Required</p>
+              }
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Description</label>
+              <input formControlName="description" placeholder="Brief description"
+                class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+            </div>
+            <div class="flex justify-end gap-3 pt-2 border-t border-slate-100">
+              <button type="button" (click)="showCreateForm = false"
+                class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition">
+                Cancel
+              </button>
+              <button type="submit" [disabled]="!createTypeForm.valid"
+                class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-semibold transition">
+                <mat-icon class="text-base">check</mat-icon>
+                Create Type
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+
+    <!-- Add Field Modal -->
+    @if (addingFieldToTypeId !== null) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center"
+        style="background: rgba(0,0,0,0.55);"
+        (click)="cancelAddField()">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4"
+          (click)="$event.stopPropagation()">
+          <div class="flex items-start justify-between px-6 pt-6 pb-4 border-b border-slate-100">
+            <div>
+              <h3 class="text-lg font-bold text-slate-900">Add Field</h3>
+              <p class="text-sm text-slate-500 mt-0.5">Define a new dynamic field for this request type</p>
+            </div>
+            <button (click)="cancelAddField()" class="text-slate-400 hover:text-slate-700 transition ml-4" aria-label="Close add field form" matTooltip="Close">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+          <form [formGroup]="addFieldForm" (ngSubmit)="addField()" class="px-6 py-5 space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Field Name *</label>
+                <input formControlName="fieldName" placeholder="e.g. laptopType"
+                  class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Field Label *</label>
+                <input formControlName="fieldLabel" placeholder="e.g. Laptop Type"
+                  class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Field Type *</label>
+                <select formControlName="fieldType"
+                  class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                  @for (ft of fieldTypes; track ft) {
+                    <option [value]="ft">{{ ft }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Display Order *</label>
+                <input formControlName="displayOrder" type="number" min="1" placeholder="1"
+                  class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+              </div>
+            </div>
+            <div class="flex items-center justify-between py-1">
+              <span class="text-sm font-semibold text-slate-700">Required Field</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" formControlName="isRequired" class="sr-only peer">
+                <div class="w-11 h-6 bg-slate-200 peer-checked:bg-blue-600 rounded-full transition-colors duration-200
+                            after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                            after:bg-white after:rounded-full after:h-5 after:w-5
+                            after:transition-all peer-checked:after:translate-x-5"></div>
+              </label>
+            </div>
+            @if (addFieldForm.get('fieldType')?.value === 'Dropdown') {
+              <div class="space-y-2">
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Options</label>
+                <div class="flex gap-2">
+                  <input #optInput placeholder="Add option and press Add"
+                    class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                  <button type="button" (click)="addOption(optInput.value); optInput.value='';"
+                    class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm">Add</button>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  @for (opt of addingOptions; let i = $index; track i) {
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border bg-white">
+                      {{ opt }}
+                      <button type="button" (click)="removeOption(i)" class="text-slate-400 hover:text-red-500 pl-1">×</button>
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+            <div class="flex justify-end gap-3 pt-2 border-t border-slate-100">
+              <button type="button" (click)="cancelAddField()"
+                class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition">
+                Cancel
+              </button>
+              <button type="submit" [disabled]="!addFieldForm.valid"
+                class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-semibold transition">
+                <mat-icon class="text-base">add</mat-icon>
+                Add Field
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+<!-- Edit Request Type Modal -->
+@if (isEditorOpen && editingType) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center"
+    style="background: rgba(0,0,0,0.55);"
+    (click)="closeEditor()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4"
+      (click)="$event.stopPropagation()">
+      <div class="flex items-start justify-between px-6 pt-6 pb-4 border-b border-slate-100">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Edit Request Type</h3>
+          <p class="text-sm text-slate-500 mt-0.5">Update the request type configuration.</p>
+        </div>
+        <button (click)="closeEditor()" class="text-slate-400 hover:text-slate-700 transition ml-4" aria-label="Close request type editor" matTooltip="Close">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <form [formGroup]="editTypeForm" (ngSubmit)="updateType()" class="px-6 py-5 space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Name *</label>
+          <input formControlName="name"
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+          @if (editTypeForm.get('name')?.touched && editTypeForm.get('name')?.hasError('required')) {
+            <p class="text-red-500 text-xs mt-1">Required</p>
+          }
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Description</label>
+          <textarea formControlName="description" rows="3"
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition resize-none"></textarea>
+        </div>
+        <div class="flex items-center justify-between py-1">
+          <span class="text-sm font-semibold text-slate-700">Active (users can create this request)</span>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" formControlName="isActive" class="sr-only peer">
+            <div class="w-11 h-6 bg-slate-200 peer-checked:bg-blue-600 rounded-full transition-colors duration-200
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:bg-white after:rounded-full after:h-5 after:w-5
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+          </label>
+        </div>
+        <div class="flex justify-end gap-3 pt-2 border-t border-slate-100">
+          <button type="button" (click)="closeEditor()"
+            class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition">
+            Cancel
+          </button>
+          <button type="submit" [disabled]="!editTypeForm.valid"
+            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-semibold transition">
+            <mat-icon class="text-base">check</mat-icon>
+            Update
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+<!-- Edit Field Modal -->
+@if (editingField !== null) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center"
+    style="background: rgba(0,0,0,0.55);"
+    (click)="closeEditField()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4"
+      (click)="$event.stopPropagation()">
+      <div class="flex items-start justify-between px-6 pt-6 pb-4 border-b border-slate-100">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Edit Field</h3>
+          <p class="text-sm text-slate-500 mt-0.5">Update field configuration.</p>
+        </div>
+        <button (click)="closeEditField()" class="text-slate-400 hover:text-slate-700 transition ml-4" aria-label="Close field editor" matTooltip="Close">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <form [formGroup]="addFieldForm" (ngSubmit)="updateField()" class="px-6 py-5 space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Field Label *</label>
+          <input formControlName="fieldLabel"
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Field Type *</label>
+          <select formControlName="fieldType"
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+            @for (ft of fieldTypes; track ft) {
+              <option [value]="ft">{{ ft }}</option>
+            }
+          </select>
+        </div>
+        <div class="flex items-center justify-between py-1">
+          <span class="text-sm font-semibold text-slate-700">Required Field</span>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" formControlName="isRequired" class="sr-only peer">
+            <div class="w-11 h-6 bg-slate-200 peer-checked:bg-blue-600 rounded-full transition-colors duration-200
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:bg-white after:rounded-full after:h-5 after:w-5
+                        after:transition-all peer-checked:after:translate-x-5"></div>
+          </label>
+        </div>
+        @if (addFieldForm.get('fieldType')?.value === 'Dropdown') {
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Options</label>
+            <div class="flex gap-2">
+              <input #editOptInput placeholder="Add option and press Add"
+                class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+              <button type="button" (click)="addOption(editOptInput.value); editOptInput.value='';"
+                class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm">Add</button>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              @for (opt of addingOptions; let i = $index; track i) {
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border bg-white">
+                  {{ opt }}
+                  <button type="button" (click)="removeOption(i)" class="text-slate-400 hover:text-red-500 pl-1">×</button>
+                </span>
+              }
+            </div>
+          </div>
+        }
+        <div class="flex justify-end gap-3 pt-2 border-t border-slate-100">
+          <button type="button" (click)="closeEditField()"
+            class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition">
+            Cancel
+          </button>
+          <button type="submit" [disabled]="!addFieldForm.valid"
+            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-semibold transition">
+            <mat-icon class="text-base">check</mat-icon>
+            Update
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+    <!-- Loading -->
+    @if (isLoading) {
+      <div class="space-y-3">
+        @for (item of [1,2,3]; track $index) {
+          <div class="skeleton h-20 rounded-2xl"></div>
+        }
+      </div>
+    }
+
+    <!-- Request Types Accordion List -->
+    @if (!isLoading && requestTypes && requestTypes.length > 0) {
+      <div class="space-y-3">
+        @for (type of requestTypes; track type.requestTypeId) {
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+            <!-- Card Header (always visible) -->
+            <div class="flex items-center justify-between px-6 py-5">
+              <div class="flex items-center gap-3 flex-1 min-w-0">
+                <div>
+                  <div class="flex items-center gap-2.5">
+                    <h3 class="font-bold text-slate-900 text-base">{{ type.name }}</h3>
+                    @if (type.isActive) {
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500 text-white">
+                        Active
+                      </span>
+                    } @else {
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-600">
+                        Inactive
+                      </span>
+                    }
+                  </div>
+                  @if (type.description) {
+                    <p class="text-sm text-slate-500 mt-0.5">{{ type.description }}</p>
+                  }
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex items-center gap-2 flex-shrink-0 ml-4">
+                <button (click)="openEditor(type)"
+                  class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition"
+                  aria-label="Edit request type"
+                  matTooltip="Edit request type">
+                  <mat-icon style="font-size:18px;width:18px;height:18px;">edit_square</mat-icon>
+                </button>
+                <button (click)="toggleExpanded(type.requestTypeId)"
+                  class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition"
+                  [attr.aria-label]="expandedTypeId === type.requestTypeId ? 'Hide fields' : 'Show fields'"
+                  [matTooltip]="expandedTypeId === type.requestTypeId ? 'Hide fields' : 'Show fields'">
+                  <mat-icon style="font-size:18px;width:18px;height:18px;">
+                    {{ expandedTypeId === type.requestTypeId ? 'expand_less' : 'expand_more' }}
+                  </mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- Expanded Fields Section -->
+            @if (expandedTypeId === type.requestTypeId) {
+              <div class="border-t border-slate-100 px-6 py-5">
+
+                <!-- Fields header -->
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-sm font-semibold text-slate-700">
+                    Dynamic Fields ({{ type.fields.length }})
+                  </h4>
+                  <button (click)="showAddField(type.requestTypeId)"
+                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition">
+                    <mat-icon style="font-size:16px;width:16px;height:16px;">add_circle_outline</mat-icon>
+                    Add Field
+                  </button>
+                </div>
+
+                <!-- Fields table -->
+                @if (type.fields && type.fields.length > 0) {
+                  <div class="rounded-xl border border-slate-100 overflow-hidden">
+                    <table class="w-full text-sm">
+                      <thead>
+                        <tr class="border-b border-slate-100 bg-slate-50">
+                          <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Label</th>
+                          <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Type</th>
+                          <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Required</th>
+                          <th class="text-right px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (field of type.fields; track field.fieldId) {
+                          <tr class="border-b border-slate-50 last:border-0 hover:bg-slate-50 transition">
+                            <td class="px-5 py-4 font-medium text-slate-900">{{ field.fieldLabel }}</td>
+                            <td class="px-5 py-4">
+                              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border border-slate-200 bg-white text-slate-600">
+                                {{ field.fieldType }}
+                              </span>
+                            </td>
+                            <td class="px-5 py-4">
+                              @if (field.isRequired) {
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white">
+                                  Required
+                                </span>
+                              } @else {
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border border-slate-200 text-slate-500">
+                                  Optional
+                                </span>
+                              }
+                            </td>
+                            <td class="px-5 py-4 text-right">
+                              <div class="flex items-center justify-end gap-1">
+                             <button (click)="openEditField(field, type.requestTypeId)"
+  class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition"
+  aria-label="Edit field"
+  matTooltip="Edit field">
+  <mat-icon style="font-size:16px;width:16px;height:16px;">edit_square</mat-icon>
+</button>
+                               <button (click)="deleteField(type.requestTypeId, field.fieldId)"
+  class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+  aria-label="Delete field"
+  matTooltip="Delete field">
+  <mat-icon style="font-size:16px;width:16px;height:16px;">delete</mat-icon>
+</button>
+                              </div>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                } @else {
+                  <div class="text-center py-8 rounded-xl border border-dashed border-slate-200">
+                    <mat-icon class="text-slate-300 mb-2" style="font-size:32px;width:32px;height:32px;">dynamic_form</mat-icon>
+                    <p class="text-slate-400 text-sm">No fields yet</p>
+                    <button (click)="showAddField(type.requestTypeId)"
+                      class="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
+                      <mat-icon style="font-size:14px;width:14px;height:14px;">add</mat-icon>
+                      Add First Field
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Empty state -->
+    @if (!isLoading && (!requestTypes || requestTypes.length === 0)) {
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm text-center py-16">
+        <mat-icon class="text-slate-300 mb-3" style="font-size:48px;width:48px;height:48px;">category</mat-icon>
+        <h3 class="text-lg font-semibold text-slate-900 mb-2">No request types found</h3>
+        <p class="text-slate-500 text-sm mb-4">Create your first request type to get started</p>
+        <button (click)="showCreateForm = true"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition">
+          <mat-icon class="text-base">add</mat-icon>
+          Create Request Type
+        </button>
+      </div>
+    }
+
+  </div>
+</app-dashboard-layout>

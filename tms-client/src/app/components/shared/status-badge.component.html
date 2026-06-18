@@ -1,0 +1,5 @@
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border"
+  [ngClass]="chipClass" [class.pulse-badge]="shouldPulse">
+  <mat-icon style="font-size:13px;width:13px;height:13px;">{{ icon }}</mat-icon>
+  {{ status === 'InApproval' ? 'In Approval' : status }}
+</span>

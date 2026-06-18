@@ -1,0 +1,139 @@
+<app-dashboard-layout>
+  <div @pageAnimation class="space-y-6">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900 mb-1">Pending Approvals</h1>
+      <p class="text-slate-600">Requests waiting for Manager approval</p>
+    </div>
+
+    <!-- Filter Bar — plain HTML, no mat-form-field -->
+    <div class="card-ui p-4 flex gap-3 items-center">
+
+      <!-- Search input -->
+  <div class="flex-1 min-w-56 relative">
+  <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">search</mat-icon>
+  <input
+    [formControl]="searchControl"
+    type="text"
+    placeholder="Search by request type, creator, or ID..."
+    class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition" />
+</div>
+
+      <!-- Type dropdown -->
+  <div class="relative min-w-44">
+       <select
+  [formControl]="requestTypeControl"
+  class="w-full appearance-none pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition cursor-pointer min-w-[150px]">
+  <option value="">All Types</option>
+  @for (type of allRequestTypes; track type.requestTypeId) {
+    <option [value]="type.name.toLowerCase()">{{ type.name }}</option>
+  }
+</select>
+        <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+          <mat-icon class="text-slate-500" style="font-size:18px;width:18px;height:18px;">expand_more</mat-icon>
+        </div>
+      </div>
+
+    </div>
+
+    @if (isLoading) {
+      <div class="space-y-3">
+        @for (item of [1,2,3]; track $index) {
+          <div class="card-ui h-16 skeleton"></div>
+        }
+      </div>
+    }
+
+    @if (!isLoading) {
+      <!-- Pending count banner -->
+      @if (visibleApprovals.length > 0) {
+        <div class="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-amber-700 font-medium">
+          <mat-icon class="text-amber-500">schedule</mat-icon>
+          {{ visibleApprovals.length }} request{{ visibleApprovals.length > 1 ? 's' : '' }} pending your approval
+        </div>
+      }
+
+      <!-- Table -->
+      <div class="card-ui overflow-hidden">
+        <table mat-table [dataSource]="visibleApprovals" class="w-full">
+
+          <ng-container matColumnDef="requestId">
+            <th mat-header-cell *matHeaderCellDef class="text-slate-600 font-semibold text-sm">Request No.</th>
+            <td mat-cell *matCellDef="let row" class="text-slate-700 font-medium">
+              <div>{{ row.requestNumber }}</div>
+              <div class="text-xs text-slate-400">ID #{{ row.requestId }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="requestTypeName">
+            <th mat-header-cell *matHeaderCellDef class="text-slate-600 font-semibold text-sm">Request Type</th>
+            <td mat-cell *matCellDef="let row" class="text-slate-700">{{ row.requestTypeName }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="requesterName">
+            <th mat-header-cell *matHeaderCellDef class="text-slate-600 font-semibold text-sm">Requested By</th>
+            <td mat-cell *matCellDef="let row" class="text-slate-700">{{ row.requesterName }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="approvalStatus">
+            <th mat-header-cell *matHeaderCellDef class="text-slate-600 font-semibold text-sm">Status</th>
+            <td mat-cell *matCellDef="let row">
+              <app-status-badge [status]="row.approvalStatus"></app-status-badge>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef class="text-slate-600 font-semibold text-sm">Submitted</th>
+            <td mat-cell *matCellDef="let row" class="text-slate-600 text-sm">{{ formatDate(row.createdAt) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="text-slate-600 font-semibold text-sm text-right">Actions</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="flex items-center justify-end gap-2">
+
+                <button mat-icon-button
+                  [routerLink]="['/approvals', row.requestId]"
+                  (click)="$event.stopPropagation()"
+                  matTooltip="View details"
+                  class="text-slate-500 hover:text-slate-800">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+
+                <button
+                  (click)="quickApprove(row.requestId, $event)"
+                  matTooltip="Quick Approve"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-green-300 text-green-700 text-sm font-medium hover:bg-green-50 transition-colors">
+                  <mat-icon style="font-size:16px;width:16px;height:16px;" class="text-green-600">check_circle_outline</mat-icon>
+                  Approve
+                </button>
+
+                <button
+                  (click)="quickReject(row.requestId, $event)"
+                  matTooltip="Quick Reject"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-300 text-red-600 text-sm font-medium hover:bg-red-50 transition-colors">
+                  <mat-icon style="font-size:16px;width:16px;height:16px;" class="text-red-500">cancel</mat-icon>
+                  Reject
+                </button>
+
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-slate-50 border-b border-slate-200"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            class="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer"
+            [routerLink]="['/approvals', row.requestId]">
+          </tr>
+        </table>
+
+        @if (visibleApprovals.length === 0) {
+          <div class="text-center py-16">
+            <mat-icon class="text-6xl text-slate-300 mb-4 block">done_all</mat-icon>
+            <h3 class="text-lg font-semibold text-slate-900 mb-1">All caught up!</h3>
+            <p class="text-slate-500">No pending approvals at the moment</p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</app-dashboard-layout>

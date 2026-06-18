@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+
+:host-context(.dark) .demo-account-button:hover {
+  background-color: #1e293b !important;
+  border-color: #818cf8 !important;
+}
+
+:host-context(.dark) .demo-account-button:hover p {
+  color: #f8fafc !important;
+}
+
+:host-context(.dark) .demo-account-button:hover p:last-child {
+  color: #cbd5e1 !important;
+}

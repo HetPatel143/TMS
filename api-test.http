@@ -1,0 +1,278 @@
+@baseUrl = http://localhost:5000/api
+@token = 
+
+### 1. AUTH ENDPOINTS
+
+### Login Admin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@company.com",
+  "password": "Admin@123"
+}
+
+### Login Employee
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@company.com",
+  "password": "Employee@123"
+}
+
+### Login Manager
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "jane.smith@company.com",
+  "password": "Manager@123"
+}
+
+---
+
+### 2. DASHBOARD ENDPOINTS
+
+### Get Employee Dashboard
+GET {{baseUrl}}/dashboard/employee
+Authorization: Bearer {{token}}
+
+### Get Approver Dashboard
+GET {{baseUrl}}/dashboard/approver
+Authorization: Bearer {{token}}
+
+### Get Admin Dashboard
+GET {{baseUrl}}/dashboard/admin
+Authorization: Bearer {{token}}
+
+---
+
+### 3. REQUEST ENDPOINTS
+
+### Get All Requests (with pagination)
+GET {{baseUrl}}/requests?pageNumber=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### Get Request by ID
+GET {{baseUrl}}/requests/1
+Authorization: Bearer {{token}}
+
+### Create Request
+POST {{baseUrl}}/requests
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "requestTypeId": 1,
+  "fieldValues": [
+    {
+      "fieldId": 1,
+      "value": "MacBook Pro"
+    }
+  ]
+}
+
+### Save as Draft
+POST {{baseUrl}}/requests/draft
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "requestTypeId": 1,
+  "fieldValues": []
+}
+
+### Update Request
+PUT {{baseUrl}}/requests/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "fieldValues": [
+    {
+      "fieldId": 1,
+      "value": "Updated Value"
+    }
+  ]
+}
+
+### Submit Request
+POST {{baseUrl}}/requests/1/submit
+Authorization: Bearer {{token}}
+
+### Delete Request
+DELETE {{baseUrl}}/requests/1
+Authorization: Bearer {{token}}
+
+---
+
+### 4. APPROVAL ENDPOINTS
+
+### Get Pending Approvals
+GET {{baseUrl}}/approvals/pending
+Authorization: Bearer {{token}}
+
+### Get Approval History
+GET {{baseUrl}}/approvals/1/history
+Authorization: Bearer {{token}}
+
+### Approve Request
+POST {{baseUrl}}/approvals/1/approve
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "comments": "Approved"
+}
+
+### Reject Request
+POST {{baseUrl}}/approvals/1/reject
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "comments": "Rejected - need more info"
+}
+
+---
+
+### 5. REQUEST TYPE ENDPOINTS
+
+### Get All Request Types
+GET {{baseUrl}}/admin/request-types
+Authorization: Bearer {{token}}
+
+### Get Request Type by ID
+GET {{baseUrl}}/admin/request-types/1
+Authorization: Bearer {{token}}
+
+### Create Request Type
+POST {{baseUrl}}/admin/request-types
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Hardware Request",
+  "description": "Request for hardware devices"
+}
+
+### Update Request Type
+PUT {{baseUrl}}/admin/request-types/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Updated Request Type",
+  "description": "Updated description"
+}
+
+---
+
+### 6. FIELD ENDPOINTS
+
+### Add Field to Request Type
+POST {{baseUrl}}/admin/request-types/1/fields
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "label": "Device Type",
+  "fieldType": "Text",
+  "isRequired": true,
+  "displayOrder": 1
+}
+
+### Update Field
+PUT {{baseUrl}}/admin/request-types/1/fields/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "label": "Updated Label",
+  "fieldType": "Text",
+  "isRequired": true,
+  "displayOrder": 1
+}
+
+---
+
+### 7. WORKFLOW ENDPOINTS
+
+### Get Workflows for Request Type
+GET {{baseUrl}}/admin/request-types/1/workflows
+Authorization: Bearer {{token}}
+
+### Set Workflow Steps
+POST {{baseUrl}}/admin/request-types/1/workflows
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+[
+  {
+    "stepOrder": 1,
+    "approverRoleId": 2
+  },
+  {
+    "stepOrder": 2,
+    "approverRoleId": 3
+  }
+]
+
+---
+
+### 8. USER ENDPOINTS
+
+### Get All Users
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{token}}
+
+### Get User by ID
+GET {{baseUrl}}/admin/users/1
+Authorization: Bearer {{token}}
+
+### Create User
+POST {{baseUrl}}/admin/users
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "newuser@company.com",
+  "fullName": "New User",
+  "roleId": 2
+}
+
+### Update User
+PUT {{baseUrl}}/admin/users/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "updated@company.com",
+  "fullName": "Updated Name"
+}
+
+### Update User Role
+PUT {{baseUrl}}/admin/users/1/role
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "roleId": 3
+}
+
+### Deactivate User
+PUT {{baseUrl}}/admin/users/1/status
+Authorization: Bearer {{token}}
+
+---
+
+### 9. REPORT ENDPOINTS
+
+### Get Reports
+GET {{baseUrl}}/reports?fromDate=2024-01-01&toDate=2024-12-31&status=All
+Authorization: Bearer {{token}}
+
+### Export Reports
+GET {{baseUrl}}/reports/export?fromDate=2024-01-01&toDate=2024-12-31&status=All
+Authorization: Bearer {{token}}

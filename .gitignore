@@ -1,0 +1,35 @@
+# Node
+node_modules/
+**/node_modules/
+npm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+dist/
+**/dist/
+tms-client/dist/
+
+# IDEs and editor
+.vs/
+.vscode/
+.idea/
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+
+# Misc
+coverage/
+coverage/**

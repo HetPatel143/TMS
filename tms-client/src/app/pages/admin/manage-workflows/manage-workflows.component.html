@@ -1,0 +1,247 @@
+<app-dashboard-layout>
+  <div @pageAnimation class="space-y-6">
+
+    <!-- Header -->
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900 mb-1">Approval Workflows</h1>
+      <p class="text-slate-500">Configure approval steps for each request type</p>
+    </div>
+
+    @if (isLoading) {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="space-y-3">
+          @for (item of [1,2,3]; track $index) {
+            <div class="skeleton h-20 rounded-2xl"></div>
+          }
+        </div>
+        <div class="lg:col-span-2">
+          <div class="skeleton h-96 rounded-2xl"></div>
+        </div>
+      </div>
+    }
+
+    @if (!isLoading) {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+
+        <!-- Left: Request Types -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-5 border-b border-slate-100">
+            <h3 class="text-lg font-bold text-slate-900">Request Types</h3>
+            <p class="text-sm text-slate-500 mt-0.5">Select a type to configure its workflow</p>
+          </div>
+          <div class="divide-y divide-slate-100">
+            @for (type of requestTypes; track type.requestTypeId) {
+             <button
+  (click)="selectType(type)"
+  class="w-full text-left px-6 py-5 transition-colors flex items-center justify-between group"
+  [class.bg-blue-600]="selectedType?.requestTypeId === type.requestTypeId"
+  [class.hover:bg-slate-50]="selectedType?.requestTypeId !== type.requestTypeId">
+  <div>
+    <h4 class="font-bold text-base"
+      [class.text-white]="selectedType?.requestTypeId === type.requestTypeId"
+      [class.text-slate-900]="selectedType?.requestTypeId !== type.requestTypeId">
+      {{ type.name }}
+    </h4>
+    <p class="text-sm mt-0.5"
+      [class.text-blue-200]="selectedType?.requestTypeId === type.requestTypeId"
+      [class.text-slate-500]="selectedType?.requestTypeId !== type.requestTypeId">
+      {{ (type.workflowSteps && type.workflowSteps.length) || 0 }}
+      approval {{ type.workflowSteps.length === 1 ? 'step' : 'steps' }}
+    </p>
+  </div>
+  <mat-icon style="font-size:20px;width:20px;height:20px;"
+    [class.text-white]="selectedType?.requestTypeId === type.requestTypeId"
+    [class.text-slate-400]="selectedType?.requestTypeId !== type.requestTypeId">
+    chevron_right
+  </mat-icon>
+</button>
+            }
+          </div>
+        </div>
+
+        <!-- Right: Workflow Configuration -->
+        <div class="lg:col-span-2">
+
+          @if (!selectedType) {
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm text-center py-20">
+              <mat-icon class="text-slate-300 mb-3" style="font-size:48px;width:48px;height:48px;">account_tree</mat-icon>
+              <h3 class="text-lg font-semibold text-slate-900 mb-1">Select a Request Type</h3>
+              <p class="text-slate-500 text-sm">Choose a request type from the left to configure its approval workflow</p>
+            </div>
+          }
+
+          @if (selectedType) {
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+              <!-- Card Header -->
+              <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
+                    <mat-icon class="text-slate-600" style="font-size:20px;width:20px;height:20px;">account_tree</mat-icon>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-bold text-slate-900">{{ selectedType.name }}</h3>
+                    <p class="text-sm text-slate-500">Configure the approval workflow for this request type</p>
+                  </div>
+                </div>
+                <button (click)="openAddStepModal()"
+                  class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-sm transition">
+                  <mat-icon style="font-size:18px;width:18px;height:18px;">add_circle_outline</mat-icon>
+                  Add Step
+                </button>
+              </div>
+
+              <!-- Flow Visualization -->
+              @if (workflowSteps.length > 0) {
+                <div class="px-6 py-4 border-b border-slate-100">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-sm text-slate-600 bg-white border border-slate-200 px-4 py-1.5 rounded-full">
+                      Employee submits
+                    </span>
+                    @for (step of workflowSteps; track step.approvalOrder) {
+                      <mat-icon class="text-slate-400" style="font-size:18px;width:18px;height:18px;">chevron_right</mat-icon>
+                      <span class="text-sm font-semibold px-4 py-1.5 rounded-full border"
+                        [ngClass]="getRoleColor(step.roleId)">
+                        {{ getRoleName(step.roleId) }}
+                      </span>
+                    }
+                    <mat-icon class="text-slate-400" style="font-size:18px;width:18px;height:18px;">chevron_right</mat-icon>
+                    <span class="text-sm font-bold bg-emerald-500 text-white px-4 py-1.5 rounded-full">
+                      Approved
+                    </span>
+                  </div>
+                </div>
+              }
+
+              <!-- Steps Table -->
+              <div class="px-6 py-5">
+                @if (workflowSteps.length > 0) {
+                  <table class="w-full text-sm">
+                    <thead>
+                      <tr class="border-b border-slate-100">
+                        <th class="text-left pb-3 text-xs font-semibold text-slate-400 uppercase tracking-widest">Order</th>
+                        <th class="text-left pb-3 text-xs font-semibold text-slate-400 uppercase tracking-widest">Approver Role</th>
+                        <th class="text-left pb-3 text-xs font-semibold text-slate-400 uppercase tracking-widest">Status</th>
+                        <th class="text-right pb-3 text-xs font-semibold text-slate-400 uppercase tracking-widest">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (step of workflowSteps; let i = $index; track i) {
+                        <tr class="border-b border-slate-50 last:border-0">
+                          <td class="py-5">
+                            <div class="w-14 h-14 rounded-full border-2 border-slate-200 flex flex-col items-center justify-center leading-tight">
+                              <span class="text-xs font-semibold text-slate-500">Step</span>
+                              <span class="text-base font-bold text-slate-800">{{ i + 1 }}</span>
+                            </div>
+                          </td>
+                          <td class="py-5">
+                            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border"
+                              [ngClass]="getRoleColor(step.roleId)">
+                              <mat-icon style="font-size:15px;width:15px;height:15px;">person</mat-icon>
+                              {{ getRoleName(step.roleId) }}
+                            </span>
+                          </td>
+                          <td class="py-5">
+                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-bold bg-emerald-500 text-white">
+                              Active
+                            </span>
+                          </td>
+                         <td class="py-5 text-right">
+  <div class="flex items-center justify-end gap-1">
+    <button (click)="moveUp(i)" [disabled]="i === 0"
+      class="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed"
+      aria-label="Move step up"
+      matTooltip="Move up">
+      <mat-icon style="font-size:20px;width:20px;height:20px;">arrow_upward</mat-icon>
+    </button>
+    <button (click)="moveDown(i)" [disabled]="i === workflowSteps.length - 1"
+      class="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed"
+      aria-label="Move step down"
+      matTooltip="Move down">
+      <mat-icon style="font-size:20px;width:20px;height:20px;">arrow_downward</mat-icon>
+    </button>
+    <button (click)="removeStep(i)"
+      class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+      aria-label="Remove workflow step"
+      matTooltip="Remove step">
+      <mat-icon style="font-size:20px;width:20px;height:20px;">delete</mat-icon>
+    </button>
+  </div>
+</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                } @else {
+                  <div class="text-center py-12 rounded-xl border border-dashed border-slate-200">
+                    <mat-icon class="text-slate-300 mb-2" style="font-size:36px;width:36px;height:36px;">account_tree</mat-icon>
+                    <p class="text-slate-400 text-sm mb-3">No approval steps configured yet</p>
+                    <button (click)="openAddStepModal()"
+                      class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
+                      <mat-icon style="font-size:14px;width:14px;height:14px;">add</mat-icon>
+                      Add First Step
+                    </button>
+                  </div>
+                }
+              </div>
+
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Add Step Modal -->
+    @if (showAddStepModal) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center"
+        style="background: rgba(0,0,0,0.55);"
+        (click)="closeAddStepModal()">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4"
+          (click)="$event.stopPropagation()">
+          <div class="flex items-start justify-between px-6 pt-6 pb-4 border-b border-slate-100">
+            <div>
+              <h3 class="text-lg font-bold text-slate-900">Add Approval Step</h3>
+              <p class="text-sm text-slate-500 mt-0.5">
+                Add a new approval step to the {{ selectedType?.name }} workflow.
+              </p>
+            </div>
+            <button (click)="closeAddStepModal()" class="text-slate-400 hover:text-slate-700 transition ml-4" aria-label="Close add step modal" matTooltip="Close">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+          <div class="px-6 py-5 space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Approver Role</label>
+              <select
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                [value]="newStepRoleId ?? ''"
+                (change)="newStepRoleId = +$any($event.target).value || null">
+                <option value="">Select a role</option>
+               @for (role of availableRoles; track role.roleId) {
+  <option [value]="role.roleId">{{ role.roleName }}</option>
+}
+              </select>
+            </div>
+            <div class="bg-slate-50 rounded-xl px-4 py-3 text-sm text-slate-500">
+              This step will be added as step
+              <strong class="text-slate-700">#{{ workflowSteps.length + 1 }}</strong>
+              in the approval sequence.
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 px-6 pb-6">
+            <button (click)="closeAddStepModal()"
+              class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition">
+              Cancel
+            </button>
+            <button (click)="addStep()" [disabled]="!newStepRoleId || isSaving"
+              class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-semibold transition">
+              <mat-icon style="font-size:16px;width:16px;height:16px;">add</mat-icon>
+              Add Step
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+  </div>
+</app-dashboard-layout>
